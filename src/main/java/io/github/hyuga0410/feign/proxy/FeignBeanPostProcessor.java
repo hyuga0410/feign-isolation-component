@@ -32,6 +32,10 @@ import java.util.Map;
 
 /**
  * FeignBeanPostProcessor
+ * <p>
+ * BeanPostProcessor:允许自定义修改新bean实例的工厂钩子，例如检查标记接口或用代理包装它们。
+ * ApplicationContexts可以在它们的bean定义中自动检测BeanPostProcessor bean，并将它们应用于随后创建的任何bean。
+ * 普通bean工厂允许对后处理器进行程序化注册，并应用于通过该工厂创建的所有bean。
  *
  * @author pengqinglong
  * @since 2022/4/9
