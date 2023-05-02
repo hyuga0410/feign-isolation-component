@@ -1,0 +1,98 @@
+package io.github.hyuga0410.feign.isolation;
+
+import cn.hyugatool.core.number.NumberUtil;
+import cn.hyugatool.core.string.StringPoundSignUtil;
+import cn.hyugatool.core.string.StringUtil;
+import cn.hyugatool.system.NetworkUtil;
+import cn.hyugatool.system.SystemUtil;
+import io.github.hyuga0410.feign.proxy.FeignProxyConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * feign isolation配置类
+ *
+ * @author hyuga
+ * @since 2022/01/07
+ */
+@Component
+@Slf4j
+public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistrar {
+
+    private static String DEFAULT_IP;
+    private static String SERVICE_SIGN;
+    private static String[] ENVIRONMENTS;
+    private static List<String> ISOLATION_IPS;
+    private static List<String> SKIP_ISOLATION_SERVICES;
+
+    public static String defaultIp() {
+        return DEFAULT_IP;
+    }
+
+    public static String serviceSign() {
+        return SERVICE_SIGN;
+    }
+
+    public static String[] environments() {
+        return ENVIRONMENTS;
+    }
+
+    public static List<String> isolationIps() {
+        return ISOLATION_IPS;
+    }
+
+    public static List<String> skipIsolationServices() {
+        return SKIP_ISOLATION_SERVICES;
+    }
+
+    @Override
+    public void registerBeanDefinitions(@NonNull AnnotationMetadata metadata, @NonNull BeanDefinitionRegistry registry) {
+        Map<String, Object> defaultAttrs = metadata.getAnnotationAttributes(FeignIsolation.class.getName());
+        if (defaultAttrs == null) {
+            log.info("Feign isolation init fail~~~");
+            return;
+        }
+
+        DEFAULT_IP = (String) defaultAttrs.get("defaultIp");
+        ENVIRONMENTS = (String[]) defaultAttrs.get("environments");
+        SERVICE_SIGN = String.valueOf(defaultAttrs.get("serviceSign"));
+        ISOLATION_IPS = StringPoundSignUtil.parseSign((String) defaultAttrs.get("isolationIps"));
+        SKIP_ISOLATION_SERVICES = StringPoundSignUtil.parseSign((String) defaultAttrs.get("skipIsolationServices"));
+
+        String localIpAddr = NetworkUtil.getLocalIpAddr();
+
+        boolean isDefaultEnv = StringUtil.equals(DEFAULT_IP, localIpAddr);
+        if (isDefaultEnv) {
+            // 做为默认环境后缀为空
+            System.setProperty(FeignProxyConstants.FEIGN_SUFFIX, StringUtil.EMPTY);
+            return;
+        }
+
+        feignIsolation(localIpAddr);
+
+        log.info("Feign isolation init success~~~");
+    }
+
+    /**
+     * 进此方法所有服务都将启用隔离
+     *
+     * @param localIpAddr 当前服务IP
+     */
+    private void feignIsolation(String localIpAddr) {
+        String hostName = SystemUtil.getLocalHostName();
+        BigDecimal ipNumber = NumberUtil.getNumber(localIpAddr);
+
+        String serviceIsolationSuffix = String.format("-%s-%s", ipNumber, hostName);
+
+        System.setProperty(FeignProxyConstants.FEIGN_SUFFIX, serviceIsolationSuffix);
+    }
+
+}
