@@ -14,6 +14,22 @@
 
 ## 核心类：FeignIsolationCore、FeignBuilderHelper
 
+## DEMO
+
+__启动类添加注解__
+
+```java
+@FeignIsolation(serviceSign = "-hyuga-", defaultIp = "127.0.0.1", isolationIps = "127.0.0.2#127.0.0.3", skipIsolationServices = "service-hyuga-dict")
+```
+
+__`application.yml`或`bootstrap.yml`添加`${feign-isolation-suffix}`__
+
+```yaml
+spring:
+  application:
+    name: service-hyuga-dict${feign-isolation-suffix}
+```
+
 # FeignProxy
 
 > 用于feignRequest执行时重定向请求地址
@@ -24,5 +40,15 @@
 - environments(String[]:default dev)：该注解生效环境，默认dev
 
 ## 核心类：FeignBeanPostProcessor
+
+## DEMO
+
+```java
+import javax.annotation.Resource;
+
+@Resource
+@FeignProvider(value = "hyuga")
+private HyugaDictFeign hyugaDictFeign;
+```
 
 
