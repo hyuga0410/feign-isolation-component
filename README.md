@@ -39,7 +39,7 @@ spring:
 ## 注解类：FeignProvider
 
 - value(String)：调用服务的后缀名
-- environments(String[]:default dev)：该注解生效环境，默认dev
+- environments(String[]:default dev)：指定生效环境，默认dev
 
 ## 核心类：FeignBeanPostProcessor
 
