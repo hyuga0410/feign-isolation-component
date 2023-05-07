@@ -1,10 +1,10 @@
 # FeignIsolation
 
-> 用于服务注册到nacos时隔离，且feignRequest调用时隔离
+> 用于SpringBoot服务注册到nacos时听过追加服务名后缀进行服务隔离，以及`feignRequest`调用时优先调用同属IP服务，不存在同属IP服务，再调用默认IP的服务。
 
 ## 注解类：FeignIsolation
 
-- environments(String[]:default dev)：该注解生效环境，默认dev
+- environments(String[]:default dev)：指定生效环境，默认dev
 - defaultIp：默认服务IP
 - isolationIps：需要强制隔离服务的IPS
 - skipIsolationServices：允许跳过隔离限制的服务（也可使用@FeignProvider指定去调用默认服务节点）
