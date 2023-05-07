@@ -1,2 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 io.github.hyuga0410.feign.proxy.FeignBeanPostProcessor
+org.springframework.boot.env.EnvironmentPostProcessor=\
+io.github.hyuga0410.feign.processor.FeignEnvironmentPostProcessor

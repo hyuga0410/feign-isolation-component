@@ -6,27 +6,17 @@ import cn.hyugatool.core.string.StringUtil;
 import cn.hyugatool.core.uri.URLUtil;
 import cn.hyugatool.system.NetworkUtil;
 import cn.hyugatool.system.SystemUtil;
-import com.alibaba.cloud.nacos.NacosDiscoveryProperties;
-import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingService;
-import com.alibaba.nacos.api.naming.pojo.ListView;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListener;
 import feign.Feign;
 import feign.Target;
+import io.github.hyuga0410.feign.isolation.redis.JedisTools;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
-import org.springframework.lang.NonNull;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+
+import static io.github.hyuga0410.feign.isolation.FeignIsolationConstants.FEIGN_REDIS_KEY_PREFIX;
 
 /**
  * FeignBuilderHelper
@@ -36,27 +26,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class FeignBuilderHelper extends Feign.Builder {
-
-    public static final String NACOS_SERVICES = "NACOS_SERVICES";
-
-    RemovalListener<String, List<String>> nacosServicesRemovalListener =
-            notification -> log.info("nacos service cache is lose effectiveness.");
-    private final LoadingCache<String, List<String>> cacheMap = CacheBuilder.newBuilder()
-            // 初始容量
-            .initialCapacity(1)
-            // 并发级别
-            .concurrencyLevel(10)
-            // 缓存多久过期
-            .expireAfterAccess(Duration.ofSeconds(10))
-            .removalListener(nacosServicesRemovalListener)
-            .build(new CacheLoader<>() {
-                @Override
-                public List<String> load(@NonNull String key) throws NacosException {
-                    List<String> nacosAllServices = getNacosAllServices();
-                    log.info("nacos service cache is initialization completed.");
-                    return nacosAllServices;
-                }
-            });
 
     /**
      * 是否需要隔离
@@ -105,10 +74,10 @@ public class FeignBuilderHelper extends Feign.Builder {
      * index2:suffix
      * index3:path
      */
-    private static final String DYNAMIC_URL = "%s-%s%s";
+    private static final String DYNAMIC_URL = "%s" + FeignIsolationConstants.ISOLATION_SYMBOL + "%s%s";
 
     @Resource
-    private ApplicationContext applicationContext;
+    private JedisTools jedisTools;
 
     /**
      * 发起feign请求时触发
@@ -153,36 +122,15 @@ public class FeignBuilderHelper extends Feign.Builder {
                     }
                 }
 
-                List<String> servicesByKeyword = getNacosServicesByHost(host);
-                if (ListUtil.isEmpty(servicesByKeyword)) {
-                    throw new RuntimeException(String.format("[%s]服务不存在，请检查!", host));
+                String key = FEIGN_REDIS_KEY_PREFIX + host + FeignIsolationConstants.ISOLATION_SYMBOL + serviceIsolationSuffix;
+                String applicationName = jedisTools.get(key);
+                if (StringUtil.hasText(applicationName)) {
+                    return String.format(DYNAMIC_URL, uri, serviceIsolationSuffix, path);
+                } else {
+                    return super.url();
                 }
-                if (servicesByKeyword.size() > 1) {
-                    long localService = servicesByKeyword.stream().filter(serviceName -> serviceName.contains(serviceIsolationSuffix)).count();
-                    if (localService == 1) {
-                        // 存在同类服务节点时调用
-                        return String.format(DYNAMIC_URL, uri, serviceIsolationSuffix, path);
-                    }
-                }
-                return super.url();
             }
         });
-    }
-
-    public List<String> getNacosServicesByHost(String host) {
-        try {
-            List<String> nacosServices = cacheMap.get(NACOS_SERVICES);
-            return nacosServices.stream().filter(server -> server.startsWith(host)).collect(Collectors.toList());
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private List<String> getNacosAllServices() throws NacosException {
-        NacosDiscoveryProperties nacosDiscoveryProperties = applicationContext.getBean(NacosDiscoveryProperties.class);
-        NamingService namingService = nacosDiscoveryProperties.namingServiceInstance();
-        ListView<String> servicesOfServer = namingService.getServicesOfServer(1, Integer.MAX_VALUE, nacosDiscoveryProperties.getGroup());
-        return servicesOfServer.getData();
     }
 
 }

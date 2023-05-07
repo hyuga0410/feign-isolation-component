@@ -27,11 +27,17 @@ import java.util.Map;
 @Slf4j
 public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistrar {
 
+    private final String localIpAddr = NetworkUtil.getLocalIpAddr();
+
     private static String DEFAULT_IP;
     private static String SERVICE_SIGN;
     private static String[] ENVIRONMENTS;
     private static List<String> ISOLATION_IPS;
     private static List<String> SKIP_ISOLATION_SERVICES;
+    private static String REDIS_URL_PATH;
+    private static String REDIS_PORT_PATH;
+    private static String REDIS_USER_PATH;
+    private static String REDIS_PWD_PATH;
 
     public static String defaultIp() {
         return DEFAULT_IP;
@@ -53,11 +59,27 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
         return SKIP_ISOLATION_SERVICES;
     }
 
+    public static String redisUrlPath() {
+        return REDIS_URL_PATH;
+    }
+
+    public static String redisPortPath() {
+        return REDIS_PORT_PATH;
+    }
+
+    public static String redisUserPath() {
+        return REDIS_USER_PATH;
+    }
+
+    public static String redisPwdPath() {
+        return REDIS_PWD_PATH;
+    }
+
     @Override
     public void registerBeanDefinitions(@NonNull AnnotationMetadata metadata, @NonNull BeanDefinitionRegistry registry) {
         Map<String, Object> defaultAttrs = metadata.getAnnotationAttributes(FeignIsolation.class.getName());
         if (defaultAttrs == null) {
-            log.info("Feign isolation init fail~~~");
+            log.info("Feign isolation initialization failed ~~~");
             return;
         }
 
@@ -66,8 +88,10 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
         SERVICE_SIGN = String.valueOf(defaultAttrs.get("serviceSign"));
         ISOLATION_IPS = StringPoundSignUtil.parseSign((String) defaultAttrs.get("isolationIps"));
         SKIP_ISOLATION_SERVICES = StringPoundSignUtil.parseSign((String) defaultAttrs.get("skipIsolationServices"));
-
-        String localIpAddr = NetworkUtil.getLocalIpAddr();
+        REDIS_URL_PATH = (String) defaultAttrs.get("redisUrlPath");
+        REDIS_PORT_PATH = (String) defaultAttrs.get("redisPortPath");
+        REDIS_USER_PATH = (String) defaultAttrs.get("redisUserPath");
+        REDIS_PWD_PATH = (String) defaultAttrs.get("redisPwdPath");
 
         boolean isDefaultEnv = StringUtil.equals(DEFAULT_IP, localIpAddr);
         if (isDefaultEnv) {
@@ -78,7 +102,7 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
 
         feignIsolation(localIpAddr);
 
-        log.info("Feign isolation init success~~~");
+        log.info("Feign isolation successful initialization ~~~");
     }
 
     /**
@@ -90,7 +114,7 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
         String hostName = SystemUtil.getLocalHostName();
         BigDecimal ipNumber = NumberUtil.getNumber(localIpAddr);
 
-        String serviceIsolationSuffix = String.format("-%s-%s", ipNumber, hostName);
+        String serviceIsolationSuffix = String.format(FeignIsolationConstants.ISOLATION_SYMBOL + "%s-%s", ipNumber, hostName);
 
         System.setProperty(FeignProxyConstants.FEIGN_SUFFIX, serviceIsolationSuffix);
     }
