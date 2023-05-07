@@ -1,6 +1,8 @@
 # FeignIsolation
 
-> 用于SpringBoot服务注册到nacos时听过追加服务名后缀进行服务隔离，以及`feignRequest`调用时优先调用同属IP服务，不存在同属IP服务，再调用默认IP的服务。
+> 用于`SpringBoot`服务注册到`nacos`时听过追加服务名后缀进行服务隔离
+>
+> 以及`feignRequest`调用时优先调用同属IP服务，不存在同属IP服务，再调用默认IP的服务。
 
 ## 注解类：FeignIsolation
 
@@ -32,7 +34,7 @@ spring:
 
 # FeignProxy
 
-> 用于feignRequest执行时重定向请求地址
+> 用于`feignRequest`执行时重定向请求地址
 
 ## 注解类：FeignProvider
 
