@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * feign isolation配置类
+ * Feign Isolation Configuration
  *
  * @author hyuga
  * @since 2022/01/07
@@ -27,7 +27,11 @@ import java.util.Map;
 @Slf4j
 public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistrar {
 
+    // Server IP address
+
     private final String localIpAddr = NetworkUtil.getLocalIpAddr();
+
+    // Configuration attributes
 
     private static String DEFAULT_IP;
     private static String SERVICE_SIGN;
@@ -38,6 +42,8 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
     private static String REDIS_PORT_PATH;
     private static String REDIS_USER_PATH;
     private static String REDIS_PWD_PATH;
+
+    // Configuration attribute acquisition method
 
     public static String defaultIp() {
         return DEFAULT_IP;
@@ -75,9 +81,15 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
         return REDIS_PWD_PATH;
     }
 
+    /**
+     * 根据导入{@code @Configuration}类的给定注释元数据，根据需要注册bean定义
+     *
+     * @param importingClassMetadata 导入类的注释元数据
+     * @param registry               当前bean定义注册表
+     */
     @Override
-    public void registerBeanDefinitions(@NonNull AnnotationMetadata metadata, @NonNull BeanDefinitionRegistry registry) {
-        Map<String, Object> defaultAttrs = metadata.getAnnotationAttributes(FeignIsolation.class.getName());
+    public void registerBeanDefinitions(@NonNull AnnotationMetadata importingClassMetadata, @NonNull BeanDefinitionRegistry registry) {
+        Map<String, Object> defaultAttrs = importingClassMetadata.getAnnotationAttributes(FeignIsolation.class.getName());
         if (defaultAttrs == null) {
             log.info("Feign isolation initialization failed ~~~");
             return;

@@ -67,9 +67,9 @@ public class FeignIsolationCore implements ApplicationRunner {
         final String redisUserPath = FeignIsolationConfiguration.redisUserPath();
         final String redisPwdPath = FeignIsolationConfiguration.redisPwdPath();
 
-        Assert.notBlank(redisUrlPath, "redis url path can not be null.");
-        Assert.notBlank(redisPortPath, "redis url port can not be null.");
-        Assert.notBlank(redisPwdPath, "redis url password can not be null.");
+        Assert.notBlank(redisUrlPath, "redis url config path can not be null.");
+        Assert.notBlank(redisPortPath, "redis url port config path can not be null.");
+        Assert.notBlank(redisPwdPath, "redis url password config path can not be null.");
 
         final String redisUrl = environment.getProperty(redisUrlPath);
         final int redisPort = Integer.parseInt(Objects.requireNonNull(environment.getProperty(redisPortPath)));

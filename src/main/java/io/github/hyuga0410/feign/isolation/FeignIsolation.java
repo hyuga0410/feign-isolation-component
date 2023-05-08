@@ -16,6 +16,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Documented
 @Import({FeignIsolationConfiguration.class, FeignIsolationCore.class})
+@SuppressWarnings("unused")
 public @interface FeignIsolation {
 
     /**

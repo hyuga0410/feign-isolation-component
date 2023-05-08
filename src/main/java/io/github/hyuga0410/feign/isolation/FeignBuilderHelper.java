@@ -90,7 +90,7 @@ public class FeignBuilderHelper extends Feign.Builder {
             @Override
             public String url() {
                 if (!isolation) {
-                    // 无需隔离
+                    // 环境未命中，不启用隔离
                     return super.url();
                 }
 
