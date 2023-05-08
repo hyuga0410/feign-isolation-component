@@ -24,84 +24,33 @@ public final class JedisTools {
     }
 
     public void set(String key, String value) {
-        Jedis jedis = null;
-        try {
-            jedis = jedisPool.getResource();
+        try (Jedis jedis = jedisPool.getResource()) {
             jedis.set(key, value);
-        } catch (Exception e) {
-            if (jedis != null) {
-                jedisPool.returnBrokenResource(jedis);
-            }
-        } finally {
-            if (jedis != null) {
-                jedisPool.returnResource(jedis);
-            }
         }
     }
 
     public void set(String key, String value, long expireSecond) {
-        Jedis jedis = null;
-        try {
-            jedis = jedisPool.getResource();
+        try (Jedis jedis = jedisPool.getResource()) {
             jedis.set(key, value);
             jedis.expire(key, expireSecond);
-        } catch (Exception e) {
-            if (jedis != null) {
-                jedisPool.returnBrokenResource(jedis);
-            }
-        } finally {
-            if (jedis != null) {
-                jedisPool.returnResource(jedis);
-            }
         }
     }
 
     public void expire(String key, long expireSecond) {
-        Jedis jedis = null;
-        try {
-            jedis = jedisPool.getResource();
+        try (Jedis jedis = jedisPool.getResource()) {
             jedis.expire(key, expireSecond);
-        } catch (Exception e) {
-            if (jedis != null) {
-                jedisPool.returnBrokenResource(jedis);
-            }
-        } finally {
-            if (jedis != null) {
-                jedisPool.returnResource(jedis);
-            }
         }
     }
 
     public String get(String key) {
-        Jedis jedis = null;
-        try {
-            jedis = jedisPool.getResource();
+        try (Jedis jedis = jedisPool.getResource()) {
             return jedis.get(key);
-        } catch (Exception e) {
-            if (jedis != null) {
-                jedisPool.returnBrokenResource(jedis);
-            }
-            return null;
-        } finally {
-            if (jedis != null) {
-                jedisPool.returnResource(jedis);
-            }
         }
     }
 
     public void del(String key) {
-        Jedis jedis = null;
-        try {
-            jedis = jedisPool.getResource();
+        try (Jedis jedis = jedisPool.getResource()) {
             jedis.del(key);
-        } catch (Exception e) {
-            if (jedis != null) {
-                jedisPool.returnBrokenResource(jedis);
-            }
-        } finally {
-            if (jedis != null) {
-                jedisPool.returnResource(jedis);
-            }
         }
     }
 
