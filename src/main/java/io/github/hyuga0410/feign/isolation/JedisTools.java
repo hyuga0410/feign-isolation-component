@@ -5,7 +5,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * RedisUtil
+ * JedisTools
  *
  * @author hyuga
  * @since 2023/5/6-05-06 10:53
