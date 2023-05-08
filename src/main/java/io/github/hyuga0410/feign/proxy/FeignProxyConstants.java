@@ -8,8 +8,6 @@ package io.github.hyuga0410.feign.proxy;
  */
 public interface FeignProxyConstants {
 
-    String DEV = "dev";
-
     String SPRING_CONFIG_ACTIVATE_ON_PROFILE = "spring.config.activate.on-profile";
 
 }

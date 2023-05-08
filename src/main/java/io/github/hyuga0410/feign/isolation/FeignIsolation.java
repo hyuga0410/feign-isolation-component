@@ -1,7 +1,7 @@
 package io.github.hyuga0410.feign.isolation;
 
 import cn.hyugatool.core.string.StringUtil;
-import io.github.hyuga0410.feign.proxy.FeignProxyConstants;
+import io.github.hyuga0410.feign.EnvironmentConstants;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -26,7 +26,7 @@ public @interface FeignIsolation {
      * <p>
      * 注意：切勿用于生产环境，初衷只用于测试环境
      */
-    String[] environments() default {FeignProxyConstants.DEV};
+    String[] environments() default {EnvironmentConstants.DEV};
 
     /**
      * 默认环境，做为允许所有跨组服务调用的服务器IP

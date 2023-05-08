@@ -1,6 +1,7 @@
 package io.github.hyuga0410.feign.proxy;
 
 import cn.hyugatool.core.string.StringUtil;
+import io.github.hyuga0410.feign.EnvironmentConstants;
 
 import java.lang.annotation.*;
 
@@ -22,6 +23,6 @@ public @interface FeignProvider {
     /**
      * 启用环境
      */
-    String[] environments() default {FeignProxyConstants.DEV};
+    String[] environments() default {EnvironmentConstants.DEV};
 
 }
