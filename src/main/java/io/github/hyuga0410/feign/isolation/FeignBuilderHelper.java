@@ -8,7 +8,6 @@ import cn.hyugatool.system.NetworkUtil;
 import cn.hyugatool.system.SystemUtil;
 import feign.Feign;
 import feign.Target;
-import io.github.hyuga0410.feign.isolation.redis.JedisTools;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;

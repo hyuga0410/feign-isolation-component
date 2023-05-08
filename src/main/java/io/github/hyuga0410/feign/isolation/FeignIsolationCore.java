@@ -3,7 +3,6 @@ package io.github.hyuga0410.feign.isolation;
 import cn.hyugatool.core.collection.ArrayUtil;
 import cn.hyugatool.core.lang.Assert;
 import cn.hyugatool.extra.concurrent.SleuthThreadScheduledPool;
-import io.github.hyuga0410.feign.isolation.redis.JedisTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -103,10 +102,5 @@ public class FeignIsolationCore implements ApplicationRunner {
             // log.info("Feign isolation heartbeat...");
         }, 1, 4, TimeUnit.SECONDS);
     }
-
-//    @Bean
-//    public Registration myNacosRegistration() {
-//        return new MyNacosRegistration();
-//    }
 
 }
