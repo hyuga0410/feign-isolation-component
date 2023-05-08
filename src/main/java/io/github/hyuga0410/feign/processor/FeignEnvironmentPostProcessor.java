@@ -1,7 +1,7 @@
 package io.github.hyuga0410.feign.processor;
 
 import cn.hyugatool.core.string.StringUtil;
-import io.github.hyuga0410.feign.proxy.FeignProxyConstants;
+import io.github.hyuga0410.feign.isolation.FeignIsolationConstants;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -17,12 +17,12 @@ public class FeignEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        String feignSuffix = System.getProperty(FeignProxyConstants.FEIGN_SUFFIX);
+        String feignSuffix = System.getProperty(FeignIsolationConstants.FEIGN_SUFFIX);
         if (StringUtil.hasText(feignSuffix)) {
             return;
         }
         // 本地单元测试赋值spring.application.name后缀
-        System.setProperty(FeignProxyConstants.FEIGN_SUFFIX, StringUtil.EMPTY);
+        System.setProperty(FeignIsolationConstants.FEIGN_SUFFIX, StringUtil.EMPTY);
     }
 
 }

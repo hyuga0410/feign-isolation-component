@@ -5,7 +5,6 @@ import cn.hyugatool.core.string.StringPoundSignUtil;
 import cn.hyugatool.core.string.StringUtil;
 import cn.hyugatool.system.NetworkUtil;
 import cn.hyugatool.system.SystemUtil;
-import io.github.hyuga0410.feign.proxy.FeignProxyConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
@@ -108,7 +107,7 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
         boolean isDefaultEnv = StringUtil.equals(DEFAULT_IP, localIpAddr);
         if (isDefaultEnv) {
             // 做为默认环境后缀为空
-            System.setProperty(FeignProxyConstants.FEIGN_SUFFIX, StringUtil.EMPTY);
+            System.setProperty(FeignIsolationConstants.FEIGN_SUFFIX, StringUtil.EMPTY);
             return;
         }
 
@@ -128,7 +127,7 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
 
         String serviceIsolationSuffix = String.format(FeignIsolationConstants.ISOLATION_SYMBOL + "%s-%s", ipNumber, hostName);
 
-        System.setProperty(FeignProxyConstants.FEIGN_SUFFIX, serviceIsolationSuffix);
+        System.setProperty(FeignIsolationConstants.FEIGN_SUFFIX, serviceIsolationSuffix);
     }
 
 }

@@ -51,9 +51,27 @@ public class FeignBeanPostProcessor implements ApplicationContextAware, BeanPost
         this.applicationContext = applicationContext;
     }
 
+    /**
+     * 将此{@code BeanPostProcessor}应用于给定的新bean实例
+     * <p>
+     * 在任何bean初始化回调之前（如InitializingBean的{@code afterPropertiesSet}或自定义init方法）。Bean将已经填充属性值。
+     * <p>
+     * 返回的bean实例可能是围绕原始实例的包装器。
+     * <p>
+     * 默认实现按原样返回给定的{@code bean}。
+     *
+     * @param bean     新的bean实例
+     * @param beanName bean名称
+     * @return 要使用的bean实例，无论是原始实例还是包装实例；
+     * 如果{@code null}，则不会调用后续的BeanPostProcessors
+     * @throws org.springframework.beans.BeansException in case of errors
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+     */
+    @Nullable
     @Override
-    public Object postProcessBeforeInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         try {
+            // 用于管理注入元数据的内部类。不打算在应用程序中直接使用
             InjectionMetadata resourceMetadata = this.buildResourceMetadata(bean.getClass());
             resourceMetadata.inject(bean, beanName, null);
         } catch (Throwable throwable) {
@@ -63,7 +81,7 @@ public class FeignBeanPostProcessor implements ApplicationContextAware, BeanPost
     }
 
     /**
-     * 构建资源元数据
+     * 构建资源元数据，自定义要对Class做的定制化处理逻辑
      *
      * @param clazz Class
      * @return InjectionMetadata 注入元数据
@@ -73,9 +91,11 @@ public class FeignBeanPostProcessor implements ApplicationContextAware, BeanPost
         Class<?> targetClass = clazz;
 
         do {
-            final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
 
+            final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
+            // springCore方法循环获取class类字段属性[对给定类中所有局部声明的字段调用给定的回调。]
             ReflectionUtils.doWithLocalFields(targetClass, field -> {
+                // 判断class类中所有字段
                 if (field.isAnnotationPresent(Resource.class)) {
                     // 仅处理带@Resource注解的类属性成员
                     currElements.add(new ResourceElement(field, null));
@@ -84,8 +104,8 @@ public class FeignBeanPostProcessor implements ApplicationContextAware, BeanPost
 
             elements.addAll(0, currElements);
             targetClass = targetClass.getSuperclass();
-        }
-        while (targetClass != null && targetClass != Object.class);
+
+        } while (targetClass != null && targetClass != Object.class);
 
         return new InjectionMetadata(clazz, elements);
     }

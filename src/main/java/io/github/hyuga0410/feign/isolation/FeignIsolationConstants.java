@@ -23,4 +23,9 @@ public interface FeignIsolationConstants {
      */
     String SPRING_APPLICATION_NAME = "spring.application.name";
 
+    /**
+     * Feign隔离后缀
+     */
+    String FEIGN_SUFFIX = "feign-isolation-suffix";
+
 }
