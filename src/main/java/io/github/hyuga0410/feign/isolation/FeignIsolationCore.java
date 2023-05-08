@@ -3,6 +3,7 @@ package io.github.hyuga0410.feign.isolation;
 import cn.hyugatool.core.collection.ArrayUtil;
 import cn.hyugatool.core.lang.Assert;
 import cn.hyugatool.extra.concurrent.SleuthThreadScheduledPool;
+import cn.hyugatool.system.NetworkUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -84,6 +85,12 @@ public class FeignIsolationCore implements ApplicationRunner {
 
         if (!isolation) {
             log.info("Feign isolation startup failed,Environmental mismatch ~~~");
+            return;
+        }
+
+        String defaultIp = FeignIsolationConfiguration.defaultIp();
+        String localIpAddr = NetworkUtil.getLocalIpAddr();
+        if (defaultIp.equals(localIpAddr)) {
             return;
         }
 
