@@ -52,7 +52,7 @@ public @interface FeignIsolation {
     /**
      * 指定隔离的服务名标识 请求的service服务名中包含该标识才进行隔离
      */
-    String[] serviceSign() default {};
+    String serviceSign() default StringUtil.EMPTY;
 
     /**
      * Redis地址配置路径
