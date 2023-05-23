@@ -1,5 +1,6 @@
 package io.github.hyuga0410.feign.isolation;
 
+import cn.hyugatool.core.collection.ArrayUtil;
 import cn.hyugatool.core.number.NumberUtil;
 import cn.hyugatool.core.string.StringPoundSignUtil;
 import cn.hyugatool.core.string.StringUtil;
@@ -7,12 +8,16 @@ import cn.hyugatool.system.NetworkUtil;
 import cn.hyugatool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +27,8 @@ import java.util.Map;
  * @author hyuga
  * @since 2022/01/07
  */
-@Component
 @Slf4j
+@Component
 public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistrar {
 
     // Server IP address
@@ -111,9 +116,27 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
             return;
         }
 
-        feignIsolation(localIpAddr);
+        String[] activeProfiles = ((DefaultListableBeanFactory) registry).getBean(Environment.class).getActiveProfiles();
+        if (needIsolation(activeProfiles)) {
+            // 非默认环境且环境命中
+            feignIsolation(localIpAddr);
+        }
 
         log.info("Feign isolation successful initialization ~~~");
+    }
+
+    @Resource
+    private Environment environment;
+
+    /**
+     * 判断当前应用启动环境是否符合组件启用环境条件
+     *
+     * @return - true:环境变量命中启用隔离 - false:环境变量未命中不启用隔离
+     */
+    private boolean needIsolation(String[] activeProfiles) {
+        final String[] environments = FeignIsolationConfiguration.environments();
+        final long count = Arrays.stream(activeProfiles).filter(profile -> ArrayUtil.contains(environments, profile)).count();
+        return count > 0;
     }
 
     /**
