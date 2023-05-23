@@ -10,7 +10,6 @@ import feign.Feign;
 import feign.Target;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.List;
@@ -30,6 +29,7 @@ public class FeignBuilderHelper extends Feign.Builder {
      * 是否需要隔离
      */
     private final boolean isolation;
+    private final JedisTools jedisTools;
     /**
      * 服务IP
      */
@@ -63,9 +63,10 @@ public class FeignBuilderHelper extends Feign.Builder {
      */
     private final String serviceIsolationSuffix = String.format("%s-%s", ipNumber, hostName);
 
-    public FeignBuilderHelper(boolean isolation) {
+    public FeignBuilderHelper(boolean isolation, JedisTools jedisTools) {
         super();
         this.isolation = isolation;
+        this.jedisTools = jedisTools;
     }
 
     /**
@@ -74,9 +75,6 @@ public class FeignBuilderHelper extends Feign.Builder {
      * index3:path
      */
     private static final String DYNAMIC_URL = "%s" + FeignIsolationConstants.ISOLATION_SYMBOL + "%s%s";
-
-    @Resource
-    private JedisTools jedisTools;
 
     /**
      * 发起feign请求时触发

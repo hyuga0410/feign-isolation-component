@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Objects;
@@ -31,6 +32,32 @@ public class FeignIsolationCore implements ApplicationRunner {
     @Resource
     private Environment environment;
 
+    private JedisTools jedisTools;
+
+    @PostConstruct
+    void jedisTools() {
+        if (!needIsolation()) {
+            return;
+        }
+        final String redisUrlPath = FeignIsolationConfiguration.redisUrlPath();
+        final String redisPortPath = FeignIsolationConfiguration.redisPortPath();
+        final String redisUserPath = FeignIsolationConfiguration.redisUserPath();
+        final String redisPwdPath = FeignIsolationConfiguration.redisPwdPath();
+
+        Assert.notBlank(redisUrlPath, "redis url config path can not be null.");
+        Assert.notBlank(redisPortPath, "redis url port config path can not be null.");
+
+        final String redisUrl = environment.getProperty(redisUrlPath);
+        Assert.notBlank(redisUrl, "redis url config can not be null.");
+        String redisPortStr = environment.getProperty(redisPortPath);
+        Assert.notBlank(redisPortStr, "redis url port config can not be null.");
+        final int redisPort = Integer.parseInt(Objects.requireNonNull(redisPortStr));
+        final String redisUser = environment.getProperty(redisUserPath);
+        final String redisPassword = environment.getProperty(redisPwdPath);
+
+        jedisTools = new JedisTools(redisUrl, redisPort, redisUser, redisPassword);
+    }
+
     /**
      * 判断当前应用启动环境是否符合组件启用环境条件
      *
@@ -49,34 +76,7 @@ public class FeignIsolationCore implements ApplicationRunner {
     @Bean
     public FeignBuilderHelper feignBuilderHelper() {
         final boolean isolation = needIsolation();
-        return new FeignBuilderHelper(isolation);
-    }
-
-    /**
-     * 创建JedisTools
-     */
-    @Bean
-    public JedisTools jedisTools() {
-        final boolean isolation = needIsolation();
-        if (!isolation) {
-            return null;
-        }
-
-        final String redisUrlPath = FeignIsolationConfiguration.redisUrlPath();
-        final String redisPortPath = FeignIsolationConfiguration.redisPortPath();
-        final String redisUserPath = FeignIsolationConfiguration.redisUserPath();
-        final String redisPwdPath = FeignIsolationConfiguration.redisPwdPath();
-
-        Assert.notBlank(redisUrlPath, "redis url config path can not be null.");
-        Assert.notBlank(redisPortPath, "redis url port config path can not be null.");
-        Assert.notBlank(redisPwdPath, "redis url password config path can not be null.");
-
-        final String redisUrl = environment.getProperty(redisUrlPath);
-        final int redisPort = Integer.parseInt(Objects.requireNonNull(environment.getProperty(redisPortPath)));
-        final String redisUser = environment.getProperty(redisUserPath);
-        final String redisPassword = environment.getProperty(redisPwdPath);
-
-        return new JedisTools(redisUrl, redisPort, redisUser, redisPassword);
+        return new FeignBuilderHelper(isolation, jedisTools);
     }
 
     @Override
@@ -98,9 +98,6 @@ public class FeignIsolationCore implements ApplicationRunner {
 
         log.info("Feign isolation startup successful ~~~");
     }
-
-    @Resource
-    private JedisTools jedisTools;
 
     private void heartbeatRegistration() {
         String springApplicationName = environment.getProperty(FeignIsolationConstants.SPRING_APPLICATION_NAME);
