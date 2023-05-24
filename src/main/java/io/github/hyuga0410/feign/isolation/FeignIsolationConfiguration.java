@@ -15,7 +15,6 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -124,9 +123,6 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
 
         log.info("Feign isolation successful initialization ~~~");
     }
-
-    @Resource
-    private Environment environment;
 
     /**
      * 判断当前应用启动环境是否符合组件启用环境条件

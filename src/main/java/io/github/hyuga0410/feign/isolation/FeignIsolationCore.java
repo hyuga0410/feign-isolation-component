@@ -101,10 +101,9 @@ public class FeignIsolationCore implements ApplicationRunner {
 
     private void heartbeatRegistration() {
         String springApplicationName = environment.getProperty(FeignIsolationConstants.SPRING_APPLICATION_NAME);
-        SleuthThreadScheduledPool.scheduleWithFixedDelay(() -> {
-            jedisTools.set(FEIGN_REDIS_KEY_PREFIX + springApplicationName, springApplicationName, 5);
-            // log.info("Feign isolation heartbeat...");
-        }, 1, 4, TimeUnit.SECONDS);
+        SleuthThreadScheduledPool.scheduleWithFixedDelay(() ->
+                jedisTools.set(FEIGN_REDIS_KEY_PREFIX + springApplicationName, springApplicationName,
+                        5), 1, 4, TimeUnit.SECONDS);
     }
 
 }
