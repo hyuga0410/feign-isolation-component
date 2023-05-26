@@ -5,7 +5,6 @@ import cn.hyugatool.core.number.NumberUtil;
 import cn.hyugatool.core.string.StringUtil;
 import cn.hyugatool.core.uri.URLUtil;
 import cn.hyugatool.system.NetworkUtil;
-import cn.hyugatool.system.SystemUtil;
 import feign.Feign;
 import feign.Target;
 import lombok.extern.slf4j.Slf4j;
@@ -51,17 +50,13 @@ public class FeignBuilderHelper extends Feign.Builder {
      */
     private final String serviceSign = FeignIsolationConfiguration.serviceSign();
     /**
-     * 服务器名
-     */
-    private final String hostName = SystemUtil.getLocalHostName();
-    /**
      * 数值IP
      */
     private final BigDecimal ipNumber = NumberUtil.getNumber(localIpAddr);
     /**
      * 自定义后缀
      */
-    private final String serviceIsolationSuffix = String.format("%s-%s", ipNumber, hostName);
+    private final String serviceIsolationSuffix = String.valueOf(ipNumber);
 
     public FeignBuilderHelper(boolean isolation, JedisTools jedisTools) {
         super();

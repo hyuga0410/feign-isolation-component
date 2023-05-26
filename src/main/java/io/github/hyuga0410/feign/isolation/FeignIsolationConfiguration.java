@@ -5,7 +5,6 @@ import cn.hyugatool.core.number.NumberUtil;
 import cn.hyugatool.core.string.StringPoundSignUtil;
 import cn.hyugatool.core.string.StringUtil;
 import cn.hyugatool.system.NetworkUtil;
-import cn.hyugatool.system.SystemUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -141,10 +140,9 @@ public class FeignIsolationConfiguration implements ImportBeanDefinitionRegistra
      * @param localIpAddr 当前服务IP
      */
     private void feignIsolation(String localIpAddr) {
-        String hostName = SystemUtil.getLocalHostName();
         BigDecimal ipNumber = NumberUtil.getNumber(localIpAddr);
 
-        String serviceIsolationSuffix = String.format(FeignIsolationConstants.ISOLATION_SYMBOL + "%s-%s", ipNumber, hostName);
+        String serviceIsolationSuffix = String.valueOf(FeignIsolationConstants.ISOLATION_SYMBOL) + ipNumber;
 
         System.setProperty(FeignIsolationConstants.FEIGN_SUFFIX, serviceIsolationSuffix);
     }
