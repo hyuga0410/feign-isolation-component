@@ -114,7 +114,7 @@ public class FeignBuilderHelper extends Feign.Builder {
                     }
                 }
 
-                String key = FEIGN_REDIS_KEY_PREFIX + host + FeignIsolationConstants.ISOLATION_SYMBOL + serviceIsolationSuffix;
+                String key = FEIGN_REDIS_KEY_PREFIX + host + FeignIsolationConstants.ISOLATION_SYMBOL + localIpAddr + ":" + serviceIsolationSuffix;
                 String applicationName = jedisTools.get(key);
                 if (StringUtil.hasText(applicationName)) {
                     return String.format(DYNAMIC_URL, uri, serviceIsolationSuffix, path);

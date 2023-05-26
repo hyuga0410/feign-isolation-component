@@ -94,16 +94,19 @@ public class FeignIsolationCore implements ApplicationRunner {
             return;
         }
 
-        heartbeatRegistration();
+        heartbeatRegistration(localIpAddr);
 
         log.info("Feign isolation startup successful ~~~");
     }
 
-    private void heartbeatRegistration() {
+    private void heartbeatRegistration(String localIpAddr) {
         String springApplicationName = environment.getProperty(FeignIsolationConstants.SPRING_APPLICATION_NAME);
         SleuthThreadScheduledPool.scheduleWithFixedDelay(() ->
-                jedisTools.set(FEIGN_REDIS_KEY_PREFIX + springApplicationName, springApplicationName,
-                        5), 1, 4, TimeUnit.SECONDS);
+                {
+                    String key = FEIGN_REDIS_KEY_PREFIX + localIpAddr + ":" + springApplicationName;
+                    jedisTools.set(key, springApplicationName, 5);
+                }
+                , 1, 4, TimeUnit.SECONDS);
     }
 
 }
