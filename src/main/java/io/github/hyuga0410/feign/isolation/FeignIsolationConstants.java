@@ -10,8 +10,10 @@ public interface FeignIsolationConstants {
 
     /**
      * 服务名追加定制化后缀的标识符
+     * <p>
+     * _和#都不行，RetryableFeignBlockingLoadBalancerClient#execute解析不到serviceId
      */
-    char ISOLATION_SYMBOL = '_';
+    char ISOLATION_SYMBOL = '-';
 
     /**
      * Redis中存放服务名的key前缀
