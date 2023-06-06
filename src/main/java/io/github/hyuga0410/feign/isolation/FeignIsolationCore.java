@@ -104,9 +104,9 @@ public class FeignIsolationCore implements ApplicationRunner {
         SleuthThreadScheduledPool.scheduleWithFixedDelay(() ->
                 {
                     String key = FEIGN_REDIS_KEY_PREFIX + localIpAddr + ":" + springApplicationName;
-                    jedisTools.set(key, springApplicationName, 5);
+                    jedisTools.set(key, springApplicationName, 8);
                 }
-                , 1, 4, TimeUnit.SECONDS);
+                , 1, 6, TimeUnit.SECONDS);
     }
 
 }
